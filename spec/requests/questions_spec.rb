@@ -23,6 +23,17 @@ RSpec.describe '/questions', type: :request do
       expect(parsed_response_data['id']).to eq(question.id.to_s)
       expect(parsed_response_data['attributes']['title']).to eq('Title')
     end
+
+    it 'supports `include` query parameter' do
+      answer = create(:answer)
+      question = answer.question
+
+      get question_url(question, include: :answers)
+
+      expect(response).to be_successful
+      expect(parsed_response['included'].length).to eq(1)
+      expect(parsed_response['included'][0]['id']).to eq(answer.id.to_s)
+    end
   end
 
   describe 'POST /create' do
