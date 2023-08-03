@@ -1,4 +1,5 @@
 require 'rails_helper'
+
 RSpec.describe '/questions', type: :request do
   describe 'GET /index' do
     it 'renders a successful response' do
@@ -30,7 +31,7 @@ RSpec.describe '/questions', type: :request do
         expect do
           post questions_url,
                headers: Requests::JsonHelpers::HEADERS,
-               params: build_jsonapi_parameters({ "title": 'Title', "body": 'Body' }, 'questions')
+               params: build_jsonapi_parameters(attributes: { title: 'Title', body: 'Body' }, type: 'questions')
         end.to change(Question, :count).by(1)
 
         question = Question.last
@@ -40,7 +41,7 @@ RSpec.describe '/questions', type: :request do
       it 'renders a JSON response with the new question' do
         post questions_url,
              headers: Requests::JsonHelpers::HEADERS,
-             params: build_jsonapi_parameters({ "title": 'Title', "body": 'Body' }, 'questions')
+             params: build_jsonapi_parameters(attributes: { title: 'Title', "body": 'Body' }, type: 'questions')
 
         expect(parsed_response_data['attributes']['title']).to eq('Title')
       end
@@ -51,12 +52,12 @@ RSpec.describe '/questions', type: :request do
         expect do
           post questions_url,
                headers: Requests::JsonHelpers::HEADERS,
-               params: build_jsonapi_parameters({ "title": 'title' }, 'questions')
+               params: build_jsonapi_parameters(attributes: { title: 'title' }, type: 'questions')
         end.to change(Question, :count).by(0)
       end
 
       it 'renders a JSON response with errors for the new question' do
-        post questions_url, headers: Requests::JsonHelpers::HEADERS, params: build_jsonapi_parameters({ "body": nil }, 'questions')
+        post questions_url, headers: Requests::JsonHelpers::HEADERS, params: build_jsonapi_parameters(attributes: { body: nil }, type: 'questions')
 
         expect(response).to have_http_status(:unprocessable_entity)
       end

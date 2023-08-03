@@ -10,8 +10,17 @@ module Requests
       @parsed_response_data ||= parsed_response['data']
     end
 
-    def build_jsonapi_parameters(attributes, type)
-      { data: { attributes:, "type": type } }.to_json
+    def build_relationships(type:, id:)
+      {
+        type.singularize => { data: { type:, id: } }
+      }
+    end
+
+    def build_jsonapi_parameters(attributes:, type:, relationships: nil)
+      params = { data: { attributes:, "type": type } }
+      params[:data][:relationships] = relationships if relationships.present?
+
+      params.to_json
     end
   end
 end
